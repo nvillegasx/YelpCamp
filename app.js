@@ -1,3 +1,6 @@
+// https://github.com/nax3t/yelp-camp-refactored
+// https://www.youtube.com/watch?v=eDWPJAzlBfM&feature=youtu.be
+
 var express = require("express");
 var app = express();
 var passport = require("passport");
@@ -6,8 +9,12 @@ var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var Campground = require("./models/campgrounds");
 var Comment = require("./models/comment");
+// sends message to the user and the next route
+var flash = require("connect-flash");
 // var seedDB = require("./seeds"); // seed the database
 var User = require("./models/user");
+
+var methodOverride = require("method-override");
 
 // requiring routes
 var commentRoutes = require("./routes/comments");
@@ -18,6 +25,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set('port', 3000);//3000 orginal
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
+app.use(flash());
 
 // PASSPORT CONFIGURATION
 app.use(require("express-session")({
@@ -33,6 +42,8 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
     res.locals.currentUser = req.user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
     next();
 });
 
@@ -45,7 +56,7 @@ mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 //Get notification of connection errors
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-seedDB();
+// seedDB();
 
 app.use(indexRoutes);
 app.use("/campgrounds", campgroundRoutes);

@@ -28,6 +28,7 @@ middlewareObj.checkCampgroundOwnership = function(req, res, next){
             res.redirect("back");
         } else if(foundCampground.author.id.equals(req.user._id)){
             req.campground = foundCampground;
+           return next();
         } else {
 
             // if(!foundCampground){
